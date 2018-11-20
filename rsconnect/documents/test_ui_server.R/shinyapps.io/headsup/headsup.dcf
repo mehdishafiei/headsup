@@ -1,0 +1,12 @@
+name: headsup
+title: headsup
+username:
+account: headsup
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 551713
+bundleId: 1706622
+url: https://headsup.shinyapps.io/headsup/
+when: 1542501852.11714
+asMultiple: FALSE
+asStatic: FALSE

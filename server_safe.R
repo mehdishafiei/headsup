@@ -1,0 +1,54 @@
+# Define server logic required to draw a histogram ----
+
+source('Data_process.R')
+
+readjmNoInf <- readRDS(file="jmNoInf.Rda")
+
+server <- function(input, output) {
+  
+  # Histogram of the Old Faithful Geyser Data ----
+  # with requested number of bins
+  # This expression that generates a histogram is wrapped in a call
+  # to renderPlot to indicate that:
+  #
+  # 1. It is "reactive" and therefore should be automatically
+  #    re-executed when inputs (input$bins) change
+  # 2. Its output type is a plot
+  
+  output$distPlot <- renderPlot({
+    
+    x    <- faithful$waiting
+    bins <- seq(min(x), max(x), length.out = input$bins + 1)
+    
+    hist(x, breaks = bins, col = "#75AADB", border = "white",
+         xlab = "Waiting time to next eruption (in mins)",
+         main = "Histogram of waiting times")
+    
+  }
+  )
+  
+  output$timeseries = renderPlot({
+    
+    plotaleData <- tail(readjmNoInf,input$bins)
+    plot(plotaleData$HR,  type="l",xlab="timestep", ylab="Heart Rate/ BPM", main="")
+  })
+  
+  output$selected_var <- renderText({ 
+    plotaleData <- tail(readjmNoInf,input$bins)
+   paste("You have selected", plotaleData[10,3])
+  # paste("You have selected", input$bins)
+  })
+  
+  output$image2 <- renderImage({
+
+      return(list(
+        src = "dHRdt.png",
+        alt = "This is a chainring"
+      ))
+  }, deleteFile = FALSE)
+  
+  
+  
+
+  
+}

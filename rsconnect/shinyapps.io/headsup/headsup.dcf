@@ -5,8 +5,8 @@ account: headsup
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 551713
-bundleId: 1699306
+bundleId: 1709942
 url: https://headsup.shinyapps.io/headsup/
-when: 1542147515.92759
+when: 1542686335.31121
 asMultiple: FALSE
 asStatic: FALSE

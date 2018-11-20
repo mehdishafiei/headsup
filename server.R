@@ -1,51 +1,67 @@
-# Define server logic required to draw a histogram ----
-
 source('Data_process.R')
 
+readjmNoInf <- readRDS(file="jmNoInf.Rda")
+
 server <- function(input, output) {
+  set.seed(122)
+  histdata <- rnorm(500)
   
-  # Histogram of the Old Faithful Geyser Data ----
-  # with requested number of bins
-  # This expression that generates a histogram is wrapped in a call
-  # to renderPlot to indicate that:
-  #
-  # 1. It is "reactive" and therefore should be automatically
-  #    re-executed when inputs (input$bins) change
-  # 2. Its output type is a plot
-  
-  output$distPlot <- renderPlot({
-    
-    x    <- faithful$waiting
-    bins <- seq(min(x), max(x), length.out = input$bins + 1)
-    
-    hist(x, breaks = bins, col = "#75AADB", border = "white",
-         xlab = "Waiting time to next eruption (in mins)",
-         main = "Histogram of waiting times")
-    
-  }
-  )
-  
-  output$timeseries = renderPlot({
-    
+  output$plot1 <- renderPlot({
+    readjmNoInf <- readRDS(file="jmNoInf.Rda")
     plotaleData <- tail(readjmNoInf,input$bins)
     plot(plotaleData$HR,  type="l",xlab="timestep", ylab="Heart Rate/ BPM", main="")
   })
   
-  output$selected_var <- renderText({ 
-   paste("You have selected", plotaleData[10,3])
-  # paste("You have selected", input$bins)
+  output$plot2 <- renderPlot({
+    data <- histdata[seq_len(input$slider)]
+    hist(data)
   })
   
-  output$image2 <- renderImage({
-
-      return(list(
-        src = "dHRdt.png",
-        alt = "This is a chainring"
-      ))
-  }, deleteFile = FALSE)
+  output$userpanel <- renderUI({
+    # session$user is non-NULL only in authenticated sessions
+    if (!is.null(session$user)) {
+      sidebarUserPanel(
+        span("Logged in as ", session$user),
+        subtitle = a(icon("sign-out"), "Logout", href="__logout__"))
+    }
+  })  # end of userpanel
+  
+  
+  output$progressBox <- renderValueBox({
+    valueBox(
+      paste0(25 + input$count, "%"), "Progress", icon = icon("list"),
+      color = "purple"
+    )
+  })
+  
+  output$approvalBox <- renderValueBox({
+    valueBox(
+      "80%", "Approval", icon = icon("thumbs-up", lib = "glyphicon"),
+      color = "yellow"
+    )
+  })
+  
+  output$mytable = DT::renderDataTable({  # for the table
+    mtcars
+  })
+  
+  
+  # for the map:
+  
+  points <- eventReactive(input$recalc, {
+    cbind(rnorm(40) * 2 + 13, rnorm(40) + 48)
+  }, ignoreNULL = FALSE)
+  
+  output$mymap <- renderLeaflet({
+    leaflet() %>%
+      addProviderTiles(providers$Stamen.TonerLite,
+                       options = providerTileOptions(noWrap = TRUE)
+      ) %>%
+      addMarkers(data = points())
+  })
   
   
   
-
+  
   
 }
